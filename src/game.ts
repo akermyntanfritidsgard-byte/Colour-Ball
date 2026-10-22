@@ -1,0 +1,7 @@
+export type Card={id:number;name:string;hex:string;balls:number[]};
+export const CARDS:Card[]=[{id:1,name:'Gul',hex:'#e5b92e',balls:[1,9]},{id:2,name:'Blå',hex:'#2865b4',balls:[2,10]},{id:3,name:'Röd',hex:'#d93437',balls:[3,11]},{id:4,name:'Lila',hex:'#8448a6',balls:[4,12]},{id:5,name:'Orange',hex:'#e98129',balls:[5,13]},{id:6,name:'Grön',hex:'#268451',balls:[6,14]},{id:7,name:'Brun',hex:'#874831',balls:[7,15]},{id:8,name:'Svart',hex:'#171717',balls:[8]}];
+export type Player={id:string;name:string};
+export type Round={number:number;players:Player[];cardsPerPlayer:1|2;assignments:Record<string,number[]>;eliminated:string[];phase:'deal'|'game';dealIndex:number};
+function randomBelow(max:number){const range=0x100000000;const limit=Math.floor(range/max)*max;const buf=new Uint32Array(1);let n:number;do{crypto.getRandomValues(buf);n=buf[0]}while(n>=limit);return n%max}
+export function shuffle<T>(items:readonly T[]):T[]{const a=[...items];for(let i=a.length-1;i>0;i--){const j=randomBelow(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+export function newRound(players:Player[],cardsPerPlayer:1|2,number=1):Round{if(!players.length||players.length*cardsPerPlayer>8)throw Error('Ogiltigt antal spelare');const shuffled=shuffle(CARDS.map(c=>c.id));const assignments:Record<string,number[]>={};players.forEach((p,i)=>assignments[p.id]=shuffled.slice(i*cardsPerPlayer,(i+1)*cardsPerPlayer));return{number,players:players.map(p=>({...p})),cardsPerPlayer,assignments,eliminated:[],phase:'deal',dealIndex:0}}
